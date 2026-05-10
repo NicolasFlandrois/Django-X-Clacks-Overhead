@@ -1,6 +1,9 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Django X-Clacks-Overhead - GNU Terry Pratchett tribute middleware
+
 [project]
 name = "django-x-clacks-overhead"
-version = "0.1.0"
+version = "1.0.0"
 description = "A X-Clacks-Overhead package for Django! Middleware, Mixin, Decorator"
 authors = [{name="Nicolas Flandrois", email="contacts@flandrois.com"},]
 maintainers = [{name="Nicolas Flandrois", email="nicolas.dev@flandrois.com"},]
@@ -8,15 +11,46 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 6.0",
+    "Intended Audience :: Developers",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 keywords = ["django", "x-clacks-overhead", "GNU Terry Pratchett", "Middleware", "Mixin", "Decorator"]
-dependencies = []
 
+dependencies = [
+    "django>=5.0.0",
+]
 
+[project.optional-dependencies]
+drf = [
+    "djangorestframework>=3.14.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["clacks"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+# UV-specific dependency groups (PEP 735)
+# For pip compatibility, use: pip install .[dev]
 [dependency-groups]
 dev = [
   {include-group = "lint"},
@@ -30,6 +64,8 @@ lint = [
 test = [
     "django>=6.0.3",
     "djangorestframework>=3.16.1",
+    "pytest>=9.0.3",
+    "pytest-django>=4.12.0",
 ]
 
 [project.urls]
@@ -76,8 +112,8 @@ exclude = [
 line-length = 120
 indent-width = 4
 
-# Assume Python 3.9
-target-version = "py314"
+# Target Python 3.12+
+target-version = "py312"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`) codes by default.

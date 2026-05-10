@@ -1,16 +1,7 @@
-import logging
-import re
-from functools import wraps
-from typing import List, Union
+"""Clacks middleware, mixin, and decorator for Django.
 
-__all__ = [
-    'ClacksMiddleware',
-    'ClacksMixin',
-    'clacks_overhead'
-]
-
-__name__ = "DjangoXClacksOverhead"
-
+This module provides the core functionality for injecting X-Clacks-Overhead headers.
+"""
 # This file is part of Django-X-Clacks-Overhead Python Package.
 # Django-X-Clacks-Overhead Python Package is free software: you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -21,16 +12,19 @@ __name__ = "DjangoXClacksOverhead"
 # You should have received a copy of the GNU General Public License along with Django-X-Clacks-Overhead Python Package.
 # If not, see <https://www.gnu.org/licenses/>.
 
-__author__ = "Nicolas Flandrois"
-__credits__ = "Nicolas Flandrois"
-__license__ = "GNU GPLv3, 2026, Nicolas Flandrois"
-__created_on__ = "2026-03-14"
-__maintainer__ = ["Nicolas Flandrois"]
-__email__ = ["contacts@flandrois.com"]
-__compatible_python_version__ = "≥ 3.12"
-__status__ = "Development in progress"
-__version__ = "0.1.0"
-__last_modified_on__ = "2026-03-14"
+import logging
+import re
+from functools import wraps
+from typing import List, Union
+
+from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
+
+__all__ = [
+    'ClacksMiddleware',
+    'ClacksMixin',
+    'clacks_overhead'
+]
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +32,7 @@ DEFAULT_CLACKS_TRIBUTE = "GNU Terry Pratchett"
 CLACKS_HEADER = "X-Clacks-Overhead"
 
 
-def __normalize_tribute(tribute: str) -> str:
+def _normalize_tribute(tribute: str) -> str:
     """Normalize a single tribute: sanitize and ensure GNU prefix."""
     if not tribute or not isinstance(tribute, str):
         return DEFAULT_CLACKS_TRIBUTE
@@ -50,22 +44,22 @@ def __normalize_tribute(tribute: str) -> str:
     return safe if safe.startswith("GNU ") else f"GNU {safe}"
 
 
-def __format_clacks_value(value: Union[str, List[str], None]) -> str:
+def _format_clacks_value(value: Union[str, List[str], None]) -> str:
     """Format clacks configuration into header-ready string."""
     if value is None:
         return DEFAULT_CLACKS_TRIBUTE
 
     if isinstance(value, str):
-        return __normalize_tribute(value)
+        return _normalize_tribute(value)
 
     if isinstance(value, (list, tuple)):
-        normalized = [__normalize_tribute(str(v)) for v in value if v]
+        normalized = [_normalize_tribute(str(v)) for v in value if v]
         return ", ".join(normalized) if normalized else DEFAULT_CLACKS_TRIBUTE
 
     return DEFAULT_CLACKS_TRIBUTE
 
 
-class ClacksMiddleware:
+class ClacksMiddleware(MiddlewareMixin):
     """
     Global middleware to inject X-Clacks-Overhead header.
 
@@ -74,7 +68,7 @@ class ClacksMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         raw_value = getattr(settings, 'CLACKS_OVERHEAD', None)
-        self.clacks_value = __format_clacks_value(raw_value)
+        self.clacks_value = _format_clacks_value(raw_value)
         logger.info(f"[ClacksMiddleware] Initialized with: {self.clacks_value}")
 
     def __call__(self, request):
@@ -110,7 +104,7 @@ class ClacksMixin:
             logger.info("[ClacksMixin] Skipped (header already set by Decorator)")
             return response
 
-        formatted = __format_clacks_value(self.clacks_tribute)
+        formatted = _format_clacks_value(self.clacks_tribute)
         response[CLACKS_HEADER] = formatted
         logger.info(f"[ClacksMixin] Set header: {formatted}")
 
@@ -130,7 +124,7 @@ def clacks_overhead(value: Union[str, List[str]]):
 
             response = view_func(view, request, *args, **kwargs)
 
-            formatted = __format_clacks_value(value)
+            formatted = _format_clacks_value(value)
             response[CLACKS_HEADER] = formatted
             logger.info(f"[ClacksDecorator] Set header: {formatted}")
 

@@ -14,7 +14,7 @@ A Django/Django REST Framework middleware system for managing the **X-Clacks-Ove
 
 In Terry Pratchett's Discworld, the **Clacks** is a semaphore tower network. When Robert Dearheart's son John died, he encoded his name into the Clacks overhead with the code **GNU**:
 - **G** — Send the message on
-- **N** — Do not log the message  
+- **N** — Do not log the message
 - **U** — Turn the message around at the end of the line and send it back again
 
 This ensures the name travels the Clacks forever. This package brings that tradition to the modern Internet (the "Roundworld Clacks").
@@ -39,11 +39,17 @@ This ensures the name travels the Clacks forever. This package brings that tradi
 
 #### PIP
 
-`pip3 install xxxxx`
+`pip3 install django-x-clacks-overhead`
 
 #### UV
 
-`uv add xxxxx`
+`uv add django-x-clacks-overhead`
+
+_optional_:
+```
+### With DRF support
+uv add django-x-clacks-overhead[drf]
+```
 
 ### 2. Add Middleware to `settings.py`
 
@@ -51,7 +57,7 @@ This ensures the name travels the Clacks forever. This package brings that tradi
 # settings.py
 MIDDLEWARE = [
     # ... other middleware
-    'DjangoXClacksOverhead.ClacksMiddleware',
+    'clacks.ClacksMiddleware',
 ]
 
 # Global default tribute (optional)
@@ -60,7 +66,7 @@ CLACKS_OVERHEAD = "Terry Pratchett"
 
 ### 3. Configure Tributes
 
-The default X-Clacks-Overhead value is `GNU Terry Pratchett`, on all 3 applications: Middleware, Mixin, Decorator. 
+The default X-Clacks-Overhead value is `GNU Terry Pratchett`, on all 3 applications: Middleware, Mixin, Decorator.
 
 Unless you configure and spécify a tribute. (See more details bellow in **Usage** section)
 
@@ -83,11 +89,31 @@ CLACKS_OVERHEAD = ["Terry Pratchett", "Alan Turing", "Ada Lovelace"]
 #### Tribute configuration on Mixin level
 
 ```python
+# views.py
+from rest_framework import viewsets
+from clacks import ClacksMixin
+
+class TributeViewSet(ClacksMixin, viewsets.ModelViewSet):
+    clacks_tribute = ["Grace Hopper", "John Warner Backus"]
+
+    queryset = MyModel.objects.all()
+    serializer_class = MySerializer
 ```
 
 #### Tribute configuration on Decorator level
 
 ```python
+# views.py
+from rest_framework.decorators import action
+from clacks import clacks_overhead
+
+class TributeViewSet(ClacksMixin, viewsets.ModelViewSet):
+    clacks_tribute = ["Terry Pratchett", "Alan Turing"]
+
+    @action(detail=False, methods=['get'])
+    @clacks_overhead("Dennis Ritchie")
+    def ada(self, request):
+        return Response({"tribute": "Dennis Ritchie"})
 ```
 
 ---
@@ -130,11 +156,11 @@ Override the Middleware tribute for an **entire ViewSet**.
 ```python
 # views.py
 from rest_framework import viewsets
-from DjangoXClacksOverhead import ClacksMixin
+from clacks import ClacksMixin
 
 class TributeViewSet(ClacksMixin, viewsets.ModelViewSet):
     clacks_tribute = ["Grace Hopper", "John Warner Backus"]
-    
+
     queryset = MyModel.objects.all()
     serializer_class = MySerializer
 
@@ -151,11 +177,11 @@ Override **both** Middleware and Mixin for a **specific endpoint**.
 ```python
 # views.py
 from rest_framework.decorators import action
-from DjangoXClacksOverhead import clacks_overhead
+from clacks import clacks_overhead
 
 class TributeViewSet(ClacksMixin, viewsets.ModelViewSet):
     clacks_tribute = ["Terry Pratchett", "Alan Turing"]
-    
+
     @action(detail=False, methods=['get'])
     @clacks_overhead("Dennis Ritchie")
     def ada(self, request):
@@ -190,7 +216,7 @@ CLACKS_OVERHEAD = "John Dearheart"  # Global default
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from DjangoXClacksOverhead import ClacksMixin, clacks_overhead
+from clacks import ClacksMixin, clacks_overhead
 
 # Endpoint: /api/default/
 # Header: X-Clacks-Overhead: GNU John Dearheart
@@ -202,7 +228,7 @@ class DefaultViewSet(viewsets.ModelViewSet):
 class TributesViewSet(ClacksMixin, viewsets.ModelViewSet):
     clacks_tribute = ["Terry Pratchett", "Alan Turing"]
     queryset = MyModel.objects.all()
-    
+
     # Endpoint: /api/tributes/ada/
     # Header: X-Clacks-Overhead: GNU Ada Lovelace
     @action(detail=False, methods=['get'])
@@ -222,14 +248,14 @@ from rest_framework.test import APITestCase
 
 @override_settings(CLACKS_OVERHEAD="John Dearheart")
 class TestClacksHeader(APITestCase):
-    
+
     def test_middleware_default(self):
         response = self.client.get('/api/default/')
         self.assertEqual(
             response.get("X-Clacks-Overhead"),
             "GNU John Dearheart"
         )
-    
+
     def test_decorator_override(self):
         response = self.client.get('/api/tributes/ada/')
         self.assertEqual(
@@ -292,7 +318,7 @@ This implementation follows the [Clacks-over-HTTP Draft RFC](https://github.com/
 
 1.  Fork the repository
 2.  Create a feature branch
-3.  Run tests: `python manage.py test`
+3.  Run tests: `uv run pytest tests/ -v`
 4.  Submit a pull request
 
 ---
