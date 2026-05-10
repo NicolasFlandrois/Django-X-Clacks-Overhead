@@ -31,7 +31,7 @@ classifiers = [
 keywords = ["django", "x-clacks-overhead", "GNU Terry Pratchett", "Middleware", "Mixin", "Decorator"]
 
 dependencies = [
-    "django>=5.0.0",
+    "django>=6.0.5",
 ]
 
 [project.optional-dependencies]
@@ -62,7 +62,7 @@ lint = [
     "ruff>=0.14.8",
 ]
 test = [
-    "django>=6.0.3",
+    "django>=6.0.5",
     "djangorestframework>=3.16.1",
     "pytest>=9.0.3",
     "pytest-django>=4.12.0",
