@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 from django.http import HttpResponse
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
