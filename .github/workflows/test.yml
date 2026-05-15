@@ -1,0 +1,35 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, develop]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: uv sync --group test
+
+      - name: Run tests with coverage
+        # Adds XML report to existing pyproject.toml's addopts (HTML + term-missing will still generate, and permanently deleted once the pipeline finises)
+        run: uv run pytest --cov-report=xml
+
+      - name: Upload coverage XML (for Codecov/GitHub)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          retention-days: 15
+
+      - name: Upload HTML report (for manual inspection)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov/
+          retention-days: 15
