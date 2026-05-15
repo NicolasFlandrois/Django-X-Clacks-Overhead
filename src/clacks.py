@@ -18,13 +18,8 @@ from functools import wraps
 from typing import List, Union
 
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
 
-__all__ = [
-    'ClacksMiddleware',
-    'ClacksMixin',
-    'clacks_overhead'
-]
+__all__ = ["ClacksMiddleware", "ClacksMixin", "clacks_overhead"]
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +32,7 @@ def _normalize_tribute(tribute: str) -> str:
     if not tribute or not isinstance(tribute, str):
         return DEFAULT_CLACKS_TRIBUTE
 
-    safe = re.sub(r'[\r\n\x00]', '', tribute.strip())
+    safe = re.sub(r"[\r\n\x00]", "", tribute.strip())
     if not safe:
         return DEFAULT_CLACKS_TRIBUTE
 
@@ -59,15 +54,16 @@ def _format_clacks_value(value: Union[str, List[str], None]) -> str:
     return DEFAULT_CLACKS_TRIBUTE
 
 
-class ClacksMiddleware(MiddlewareMixin):
+class ClacksMiddleware:
     """
     Global middleware to inject X-Clacks-Overhead header.
 
     Precedence: LOWEST - Only sets header if not already set by Mixin/Decorator.
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
-        raw_value = getattr(settings, 'CLACKS_OVERHEAD', None)
+        raw_value = getattr(settings, "CLACKS_OVERHEAD", None)
         self.clacks_value = _format_clacks_value(raw_value)
         logger.info(f"[ClacksMiddleware] Initialized with: {self.clacks_value}")
 
@@ -90,10 +86,13 @@ class ClacksMixin:
 
     Precedence: MEDIUM - Overrides Middleware, but respects Decorator.
     """
+
     clacks_tribute = None
 
     def finalize_response(self, request, response, *args, **kwargs):
-        response = super().finalize_response(request, response, *args, **kwargs)
+        response = super().finalize_response(request, response, *args, **kwargs)  # type: ignore[attr-defined]
+        # ClacksMixin is designed to be mixed into a class like ViewSet or View that does have `finalize_response()`,
+        # but the type checker can't infer this at analysis time.
 
         if self.clacks_tribute is None:
             logger.debug("[ClacksMixin] No tribute configured, skipping")
@@ -117,6 +116,7 @@ def clacks_overhead(value: Union[str, List[str]]):
 
     Precedence: HIGHEST - Always sets header, overrides Mixin and Middleware.
     """
+
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(view, request, *args, **kwargs):
@@ -131,4 +131,5 @@ def clacks_overhead(value: Union[str, List[str]]):
             return response
 
         return _wrapped_view
+
     return decorator
