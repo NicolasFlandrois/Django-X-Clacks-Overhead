@@ -37,6 +37,7 @@ def _setup_viewset_instance(viewset_cls, request, format=None):
     instance.format_kwarg = format
     return instance
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 🎭 Decorator Tests
 # ─────────────────────────────────────────────────────────────────────────────

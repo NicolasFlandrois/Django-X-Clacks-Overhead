@@ -1,2 +1,43 @@
 [flake8]
 max-line-length = 191
+extend-ignore = W503
+
+# Exclude directories and files that should never be linted
+exclude =
+    .git,
+    .venv,
+    venv,
+    .tox,
+    .nox,
+    .eggs,
+    __pycache__,
+    *.pyc,
+    *.pyo,
+    *.pyd,
+    .mypy_cache,
+    .pytest_cache,
+    .ruff_cache,
+    .vscode,
+    .zed,
+    .github,
+    build,
+    dist,
+    *.egg-info,
+    htmlcov,
+    .coverage,
+    uv.lock,
+    *.egg,
+    *.whl,
+
+# Only process Python files
+filename = *.py
+
+# per-file-ignores =
+#     # Tests: allow assert, no docstrings required, allow long test names
+#     tests/*: S101, D100, D101, D102, D103, D205, D400, PLR2004
+#
+#     # Migrations: often have unused imports, long lines
+#     */migrations/*: F401, E501
+#
+#     # __init__.py: re-exports are intentional
+#     */__init__.py: F401

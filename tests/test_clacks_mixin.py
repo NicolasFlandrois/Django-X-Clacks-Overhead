@@ -40,6 +40,7 @@ def _setup_viewset_instance(viewset_cls, request, format=None):
     instance.format_kwarg = format
     return instance
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 🧩 Mixin Tests
 # ─────────────────────────────────────────────────────────────────────────────
@@ -72,13 +73,14 @@ class TestClacksMixin:
         response = Response({"test": "data"})
 
         # Mock parent's finalize_response to avoid full DRF setup
-        with patch('rest_framework.views.APIView.finalize_response', return_value=response):
+        with patch("rest_framework.views.APIView.finalize_response", return_value=response):
             final_resp = viewset.finalize_response(drf_request, response)
 
         assert final_resp.get(CLACKS_HEADER) == "GNU Mixin Tribute"
 
     def test_mixin_handles_list_tributes(self, drf_rf):
         """Mixin formats list of tributes correctly."""
+
         class ListView(self.TestView):
             clacks_tribute = ["Grace Hopper", "John Backus"]
 
@@ -90,13 +92,14 @@ class TestClacksMixin:
 
         response = Response({})
 
-        with patch('rest_framework.views.APIView.finalize_response', return_value=response):
+        with patch("rest_framework.views.APIView.finalize_response", return_value=response):
             final_resp = viewset.finalize_response(drf_request, response)
 
         assert final_resp.get(CLACKS_HEADER) == "GNU Grace Hopper, GNU John Backus"
 
     def test_mixin_skips_when_tribute_is_none(self, drf_rf):
         """Mixin does nothing when clacks_tribute is None."""
+
         class NoTributeView(self.TestView):
             clacks_tribute = None
 
@@ -108,7 +111,7 @@ class TestClacksMixin:
 
         response = Response({})
 
-        with patch('rest_framework.views.APIView.finalize_response', return_value=response):
+        with patch("rest_framework.views.APIView.finalize_response", return_value=response):
             final_resp = viewset.finalize_response(drf_request, response)
 
         # Header should NOT be set by mixin when tribute is None
@@ -126,7 +129,7 @@ class TestClacksMixin:
         response = Response({"status": "decorated"})
         response[CLACKS_HEADER] = "GNU Decorator Wins"
 
-        with patch('rest_framework.views.APIView.finalize_response', return_value=response):
+        with patch("rest_framework.views.APIView.finalize_response", return_value=response):
             final_resp = viewset.finalize_response(drf_request, response)
 
         # Mixin should respect the existing header

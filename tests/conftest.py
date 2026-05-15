@@ -1,4 +1,5 @@
 """Pytest configuration for Django-X-Clacks-Overhead."""
+
 import os
 import sys
 
@@ -47,9 +48,7 @@ if not settings.configured:
 # pytest-django configuration
 def pytest_configure(config):
     """Configure pytest-django."""
-    config.addinivalue_line(
-        "markers", "django_db: mark test to use database"
-    )
+    config.addinivalue_line("markers", "django_db: mark test to use database")
 
 
 pytest_plugins = ["pytest_django"]

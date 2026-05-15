@@ -34,6 +34,7 @@ def _setup_viewset_instance(viewset_cls, request, format=None):
     instance.format_kwarg = format
     return instance
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 🌐 Middleware Tests
 # ─────────────────────────────────────────────────────────────────────────────
@@ -61,6 +62,7 @@ class TestClacksMiddleware:
 
     def test_skips_if_header_already_set(self, django_rf):
         """Middleware should respect higher-precedence layers."""
+
         def custom_get_response(req):
             resp = HttpResponse("OK")
             resp[CLACKS_HEADER] = "GNU Already Set"

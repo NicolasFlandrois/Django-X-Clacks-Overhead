@@ -2,6 +2,7 @@
 Comprehensive test suite for Django-X-Clacks-Overhead.
 Covers: Middleware, Mixin, Decorator, Precedence Logic, Security, Edge Cases.
 """
+
 from unittest.mock import patch
 
 import pytest
@@ -13,8 +14,14 @@ from rest_framework.response import Response
 from rest_framework.test import APIRequestFactory
 from rest_framework.viewsets import ViewSet
 
-from clacks import (CLACKS_HEADER, DEFAULT_CLACKS_TRIBUTE, ClacksMiddleware,
-                    ClacksMixin, _format_clacks_value, clacks_overhead)
+from clacks import (
+    CLACKS_HEADER,
+    DEFAULT_CLACKS_TRIBUTE,
+    ClacksMiddleware,
+    ClacksMixin,
+    _format_clacks_value,
+    clacks_overhead,
+)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🛠️ Test Fixtures & Helpers
@@ -49,6 +56,7 @@ def _setup_viewset_instance(viewset_cls, request, format=None):
 # ─────────────────────────────────────────────────────────────────────────────
 # ⚖️ Full Precedence Integration Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.django_db
 class TestPrecedenceLogic:
@@ -89,7 +97,7 @@ class TestPrecedenceLogic:
         response = viewset.list(drf_request)
 
         # Now call finalize_response with mocked parent
-        with patch('rest_framework.views.APIView.finalize_response', return_value=response):
+        with patch("rest_framework.views.APIView.finalize_response", return_value=response):
             final_resp = viewset.finalize_response(drf_request, response)
 
         assert final_resp.get(CLACKS_HEADER) == "GNU Middleware Override (Mixin)"
@@ -113,13 +121,14 @@ class TestPrecedenceLogic:
         response = Response({"layer": "mixin"})
 
         # Mock parent's finalize_response to avoid full DRF setup
-        with patch('rest_framework.views.APIView.finalize_response', return_value=response):
+        with patch("rest_framework.views.APIView.finalize_response", return_value=response):
             final_resp = viewset.finalize_response(drf_request, response)
 
         assert final_resp.get(CLACKS_HEADER) == "GNU Middleware Override (Mixin)"
 
     def test_empty_everywhere_falls_back_to_default(self, drf_rf, django_rf):
         """If all layers are empty/None, default is used."""
+
         class EmptyMixinView(ClacksMixin, ViewSet):
             clacks_tribute = None
 
