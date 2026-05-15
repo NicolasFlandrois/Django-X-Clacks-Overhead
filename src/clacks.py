@@ -15,9 +15,17 @@ This module provides the core functionality for injecting X-Clacks-Overhead head
 import logging
 import re
 from functools import wraps
+from importlib.metadata import PackageNotFoundError, version
 from typing import List, Union
 
 from django.conf import settings
+
+__version__ = "1.0.1+dev"  # Fallback for dev/source runs - Update this when developing on new version.
+
+try:
+    __version__ = version("django-x-clacks-overhead")  # Prefer installed metadata
+except PackageNotFoundError:
+    pass
 
 __all__ = ["ClacksMiddleware", "ClacksMixin", "clacks_overhead"]
 
