@@ -318,8 +318,8 @@ This implementation follows the [Clacks-over-HTTP Draft RFC](https://github.com/
 
 1.  Fork the repository
 2.  Create a feature branch
-3.  Run tests: `uv run pytest tests/ -v`
-4.  Submit a pull request
+3.  Run tests: `uv run pytest`
+4.  Submit a Pull Request
 
 ---
 
