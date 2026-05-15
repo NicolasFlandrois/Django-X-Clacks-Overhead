@@ -3,7 +3,7 @@
 
 [project]
 name = "django-x-clacks-overhead"
-version = "1.0.0"
+version = "1.0.1"
 description = "A X-Clacks-Overhead package for Django! Middleware, Mixin, Decorator"
 authors = [{name="Nicolas Flandrois", email="contacts@flandrois.com"},]
 maintainers = [{name="Nicolas Flandrois", email="nicolas.dev@flandrois.com"},]
